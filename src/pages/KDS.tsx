@@ -124,35 +124,66 @@ export default function KDS() {
         </div>
       </header>
 
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 overflow-auto">
-        {COLUMNS.map((col) => {
-          const colOrders = filteredOrders.filter((x) => x.order.status === col.status);
-          return (
-            <div key={col.status} className="kds-column-bg rounded-xl p-4 flex flex-col">
-              <div className="flex items-center gap-2 mb-4">
-                <div className={`w-3 h-3 rounded-full ${col.accent}`} />
-                <h2 className="text-lg font-bold text-kds-card-foreground">{col.title}</h2>
-                <span className="ml-auto text-sm font-mono text-muted-foreground">{colOrders.length}</span>
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+        <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 overflow-auto">
+          {COLUMNS.map((col) => {
+            const colOrders = filteredOrders.filter((x) => x.order.status === col.status);
+            return (
+              <div key={col.status} className="kds-column-bg rounded-xl p-4 flex flex-col">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className={`w-3 h-3 rounded-full ${col.accent}`} />
+                  <h2 className="text-lg font-bold text-kds-card-foreground">{col.title}</h2>
+                  <span className="ml-auto text-sm font-mono text-muted-foreground">{colOrders.length}</span>
+                </div>
+                <div className="flex-1 space-y-3 overflow-y-auto">
+                  {colOrders.map(({ order, items }) => (
+                    <OrderCard
+                      key={order.id}
+                      order={order}
+                      items={items}
+                      onAdvance={updateOrderStatus}
+                      onRemove={removeOrder}
+                    />
+                  ))}
+                  {colOrders.length === 0 && (
+                    <div className="text-center text-muted-foreground text-sm py-8 opacity-50">
+                      Nenhum pedido
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="flex-1 space-y-3 overflow-y-auto">
-                {colOrders.map(({ order, items }) => (
-                  <OrderCard
-                    key={order.id}
-                    order={order}
-                    items={items}
-                    onAdvance={updateOrderStatus}
-                    onRemove={removeOrder}
-                  />
-                ))}
-                {colOrders.length === 0 && (
-                  <div className="text-center text-muted-foreground text-sm py-8 opacity-50">
-                    Nenhum pedido
-                  </div>
-                )}
-              </div>
+            );
+          })}
+        </div>
+
+        <aside className="w-full md:w-80 shrink-0 border-t md:border-t-0 md:border-l border-border/20 bg-muted/30 p-4 overflow-y-auto">
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-kds-card-foreground flex items-center gap-2">
+              <Flame className="h-5 w-5 text-primary" /> Fila de Produção
+            </h2>
+            <p className="text-xs text-muted-foreground mt-0.5">Itens em preparo</p>
+          </div>
+
+          {productionSummary.length === 0 ? (
+            <div className="text-center text-muted-foreground text-sm py-8 opacity-60">
+              Nenhum item em produção
             </div>
-          );
-        })}
+          ) : (
+            <ul className="space-y-2">
+              {productionSummary.map((it) => (
+                <li
+                  key={it.name}
+                  className="flex items-center justify-between gap-3 bg-kds-card-bg/60 border border-border/20 rounded-lg px-3 py-2"
+                >
+                  <span className="text-sm font-medium text-kds-card-foreground truncate">{it.name}</span>
+                  <Badge className="bg-primary text-primary-foreground font-mono text-sm shrink-0">
+                    ×{it.totalQuantity}
+                  </Badge>
+                </li>
+              ))}
+            </ul>
+          )}
+        </aside>
       </div>
     </div>
   );
