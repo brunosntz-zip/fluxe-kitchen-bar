@@ -31,7 +31,7 @@ const App = () => (
                 <Route path="menu" element={<MenuManagement />} />
                 <Route path="tables" element={<TableManagement />} />
               </Route>
-              <Route path="/kds" element={<ProtectedRoute allowedRoles={["manager", "kitchen"]}><KDS /></ProtectedRoute>} />
+              <Route path="/kds" element={<ProtectedRoute allowedRoles={["manager", "kitchen", "bar"]}><KDS /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
