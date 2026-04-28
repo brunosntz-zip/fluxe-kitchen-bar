@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { MenuItem, Table, Order, OrderStatus, OrderItem } from "@/types";
+import { MenuItem, Table, Order, OrderStatus, OrderItem, DeliveryMode } from "@/types";
 
 interface StoreContextType {
   menuItems: MenuItem[];
@@ -10,7 +10,7 @@ interface StoreContextType {
   addTable: (number: number, label: string) => void;
   deleteTable: (id: string) => void;
   orders: Order[];
-  addOrder: (tableNumber: number, tableLabel: string, items: OrderItem[], notes?: string) => void;
+  addOrder: (tableLabel: string, items: OrderItem[], deliveryMode: DeliveryMode, tableNumber?: number, notes?: string) => void;
   updateOrderStatus: (id: string, status: OrderStatus) => void;
   removeOrder: (id: string) => void;
 }
@@ -18,12 +18,12 @@ interface StoreContextType {
 const StoreContext = createContext<StoreContextType | null>(null);
 
 const INITIAL_MENU: MenuItem[] = [
-  { id: "1", name: "X-Burger Artesanal", price: 32.9, category: "Lanches", available: true },
-  { id: "2", name: "Batata Frita Grande", price: 18.5, category: "Porções", available: true },
-  { id: "3", name: "Caipirinha de Limão", price: 22.0, category: "Bebidas", available: true },
-  { id: "4", name: "Picanha na Chapa", price: 59.9, category: "Pratos", available: true },
-  { id: "5", name: "Coca-Cola 350ml", price: 8.0, category: "Bebidas", available: false },
-  { id: "6", name: "Brownie com Sorvete", price: 24.0, category: "Sobremesas", available: true },
+  { id: "1", name: "X-Burger Artesanal", price: 32.9, category: "Lanches", available: true, station: "kitchen" },
+  { id: "2", name: "Batata Frita Grande", price: 18.5, category: "Porções", available: true, station: "kitchen" },
+  { id: "3", name: "Caipirinha de Limão", price: 22.0, category: "Bebidas", available: true, station: "bar" },
+  { id: "4", name: "Picanha na Chapa", price: 59.9, category: "Pratos", available: true, station: "kitchen" },
+  { id: "5", name: "Coca-Cola 350ml", price: 8.0, category: "Bebidas", available: false, station: "bar" },
+  { id: "6", name: "Brownie com Sorvete", price: 24.0, category: "Sobremesas", available: true, station: "kitchen" },
 ];
 
 const INITIAL_TABLES: Table[] = [
@@ -38,35 +38,39 @@ const INITIAL_ORDERS: Order[] = [
   {
     id: "o1", tableNumber: 1, tableLabel: "Mesa 1", status: "received",
     createdAt: new Date(Date.now() - 3 * 60000),
+    deliveryMode: "table",
     items: [
-      { menuItemId: "1", name: "X-Burger Artesanal", quantity: 2, notes: "Sem cebola" },
-      { menuItemId: "2", name: "Batata Frita Grande", quantity: 1 },
+      { menuItemId: "1", name: "X-Burger Artesanal", quantity: 2, notes: "Sem cebola", station: "kitchen" },
+      { menuItemId: "2", name: "Batata Frita Grande", quantity: 1, station: "kitchen" },
+      { menuItemId: "3", name: "Caipirinha de Limão", quantity: 1, station: "bar" },
     ],
     notes: "Cliente com pressa",
   },
   {
     id: "o2", tableNumber: 3, tableLabel: "Mesa 3", status: "received",
     createdAt: new Date(Date.now() - 8 * 60000),
+    deliveryMode: "table",
     items: [
-      { menuItemId: "4", name: "Picanha na Chapa", quantity: 1 },
-      { menuItemId: "3", name: "Caipirinha de Limão", quantity: 2 },
+      { menuItemId: "4", name: "Picanha na Chapa", quantity: 1, station: "kitchen" },
+      { menuItemId: "3", name: "Caipirinha de Limão", quantity: 2, station: "bar" },
     ],
   },
   {
     id: "o3", tableNumber: 2, tableLabel: "Mesa 2", status: "preparing",
     createdAt: new Date(Date.now() - 15 * 60000),
+    deliveryMode: "table",
     items: [
-      { menuItemId: "6", name: "Brownie com Sorvete", quantity: 3 },
+      { menuItemId: "6", name: "Brownie com Sorvete", quantity: 3, station: "kitchen" },
     ],
     notes: "Aniversário - colocar vela",
   },
   {
-    id: "o4", tableNumber: 5, tableLabel: "Mesa 5", status: "ready",
-    createdAt: new Date(Date.now() - 20 * 60000),
+    id: "o4", tableLabel: "Balcão - Pedido #5847", status: "ready",
+    createdAt: new Date(Date.now() - 6 * 60000),
+    deliveryMode: "pickup",
     items: [
-      { menuItemId: "1", name: "X-Burger Artesanal", quantity: 1 },
-      { menuItemId: "2", name: "Batata Frita Grande", quantity: 1 },
-      { menuItemId: "3", name: "Caipirinha de Limão", quantity: 1 },
+      { menuItemId: "3", name: "Caipirinha de Limão", quantity: 2, station: "bar" },
+      { menuItemId: "5", name: "Coca-Cola 350ml", quantity: 1, station: "bar" },
     ],
   },
 ];
@@ -96,10 +100,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setTables((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const addOrder = useCallback((tableNumber: number, tableLabel: string, items: OrderItem[], notes?: string) => {
+  const addOrder = useCallback((tableLabel: string, items: OrderItem[], deliveryMode: DeliveryMode, tableNumber?: number, notes?: string) => {
     setOrders((prev) => [
       ...prev,
-      { id: crypto.randomUUID(), tableNumber, tableLabel, items, status: "received", createdAt: new Date(), notes },
+      { id: crypto.randomUUID(), tableNumber, tableLabel, items, status: "received", createdAt: new Date(), notes, deliveryMode },
     ]);
   }, []);
 
