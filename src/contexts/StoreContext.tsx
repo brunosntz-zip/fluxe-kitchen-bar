@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from "react";
-import { MenuItem, Table, Order, OrderStatus, OrderItem, DeliveryMode } from "@/types";
+import { MenuItem, Table, Order, OrderStatus, OrderItem, DeliveryMode, Customer } from "@/types";
 
 interface StoreContextType {
   menuItems: MenuItem[];
@@ -13,6 +13,9 @@ interface StoreContextType {
   addOrder: (tableLabel: string, items: OrderItem[], deliveryMode: DeliveryMode, tableNumber?: number, notes?: string) => void;
   updateOrderStatus: (id: string, status: OrderStatus) => void;
   removeOrder: (id: string) => void;
+  customers: Customer[];
+  addCustomer: (data: Omit<Customer, "id" | "checkInAt" | "active">) => Customer;
+  checkOutCustomer: (id: string) => void;
 }
 
 const StoreContext = createContext<StoreContextType | null>(null);
@@ -79,6 +82,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [menuItems, setMenuItems] = useState<MenuItem[]>(INITIAL_MENU);
   const [tables, setTables] = useState<Table[]>(INITIAL_TABLES);
   const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+
+  const addCustomer = useCallback((data: Omit<Customer, "id" | "checkInAt" | "active">) => {
+    const customer: Customer = { ...data, id: crypto.randomUUID(), checkInAt: new Date(), active: true };
+    setCustomers((prev) => [...prev, customer]);
+    return customer;
+  }, []);
+
+  const checkOutCustomer = useCallback((id: string) => {
+    setCustomers((prev) => prev.map((c) => (c.id === id ? { ...c, active: false } : c)));
+  }, []);
 
   const addMenuItem = useCallback((item: Omit<MenuItem, "id">) => {
     setMenuItems((prev) => [...prev, { ...item, id: crypto.randomUUID() }]);
@@ -116,7 +130,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <StoreContext.Provider value={{ menuItems, addMenuItem, updateMenuItem, deleteMenuItem, tables, addTable, deleteTable, orders, addOrder, updateOrderStatus, removeOrder }}>
+    <StoreContext.Provider value={{ menuItems, addMenuItem, updateMenuItem, deleteMenuItem, tables, addTable, deleteTable, orders, addOrder, updateOrderStatus, removeOrder, customers, addCustomer, checkOutCustomer }}>
       {children}
     </StoreContext.Provider>
   );

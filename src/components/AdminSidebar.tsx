@@ -1,4 +1,4 @@
-import { LayoutDashboard, UtensilsCrossed, Grid3X3, Monitor, LogOut } from "lucide-react";
+import { LayoutDashboard, UtensilsCrossed, Grid3X3, Monitor, LogOut, Users } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -15,12 +15,21 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
+import { UserRole } from "@/types";
 
-const navItems = [
-  { title: "Visão Geral", url: "/admin", icon: LayoutDashboard },
-  { title: "Cardápio", url: "/admin/menu", icon: UtensilsCrossed },
-  { title: "Mesas", url: "/admin/tables", icon: Grid3X3 },
-  { title: "KDS", url: "/kds", icon: Monitor },
+interface NavItem {
+  title: string;
+  url: string;
+  icon: typeof LayoutDashboard;
+  roles: UserRole[];
+}
+
+const navItems: NavItem[] = [
+  { title: "Visão Geral", url: "/admin", icon: LayoutDashboard, roles: ["manager"] },
+  { title: "Cardápio", url: "/admin/menu", icon: UtensilsCrossed, roles: ["manager"] },
+  { title: "Mesas", url: "/admin/tables", icon: Grid3X3, roles: ["manager"] },
+  { title: "Recepção", url: "/admin/reception", icon: Users, roles: ["manager", "receptionist"] },
+  { title: "KDS", url: "/kds", icon: Monitor, roles: ["manager"] },
 ];
 
 export function AdminSidebar() {
@@ -43,7 +52,7 @@ export function AdminSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => (
+              {navItems.filter((item) => user && item.roles.includes(user.role)).map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
                     <NavLink

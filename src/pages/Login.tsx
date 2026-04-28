@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ChefHat, ShieldCheck, Wine } from "lucide-react";
+import { ChefHat, ShieldCheck, Wine, Users } from "lucide-react";
 
 export default function Login() {
   const { login } = useAuth();
@@ -14,10 +14,15 @@ export default function Login() {
   const [name, setName] = useState("");
 
   const handleLogin = (role: UserRole) => {
-    const fallback = role === "manager" ? "Gerente" : role === "bar" ? "Bar" : "Cozinha";
+    const fallback =
+      role === "manager" ? "Gerente" :
+      role === "bar" ? "Bar" :
+      role === "receptionist" ? "Recepção" : "Cozinha";
     const displayName = name.trim() || fallback;
     login(displayName, role);
-    navigate(role === "manager" ? "/admin" : "/kds");
+    if (role === "manager") navigate("/admin");
+    else if (role === "receptionist") navigate("/admin/reception");
+    else navigate("/kds");
   };
 
   return (
@@ -35,10 +40,14 @@ export default function Login() {
             <Label htmlFor="name">Seu nome (opcional)</Label>
             <Input id="name" placeholder="Ex: Carlos" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-3">
             <Button onClick={() => handleLogin("manager")} className="h-20 flex-col gap-2" variant="default">
               <ShieldCheck className="h-5 w-5" />
               <span className="text-xs font-semibold">Gerente</span>
+            </Button>
+            <Button onClick={() => handleLogin("receptionist")} className="h-20 flex-col gap-2" variant="default">
+              <Users className="h-5 w-5" />
+              <span className="text-xs font-semibold">Recepção</span>
             </Button>
             <Button onClick={() => handleLogin("kitchen")} className="h-20 flex-col gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/80" variant="secondary">
               <ChefHat className="h-5 w-5" />
@@ -50,7 +59,7 @@ export default function Login() {
             </Button>
           </div>
           <p className="text-xs text-muted-foreground text-center">
-            Gerente acessa Admin e KDS. Cozinha e Bar acessam apenas seus KDS.
+            Cada perfil é direcionado para sua área de trabalho.
           </p>
         </CardContent>
       </Card>
