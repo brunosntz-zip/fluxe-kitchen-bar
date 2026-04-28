@@ -9,6 +9,7 @@ import AdminLayout from "@/layouts/AdminLayout";
 import Dashboard from "@/pages/admin/Dashboard";
 import MenuManagement from "@/pages/admin/MenuManagement";
 import TableManagement from "@/pages/admin/TableManagement";
+import Reception from "@/pages/admin/Reception";
 import KDS from "@/pages/KDS";
 import NotFound from "@/pages/NotFound";
 
@@ -21,10 +22,11 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Login />} />
-            <Route path="/admin" element={<ProtectedRoute allowedRoles={["manager"]}><AdminLayout /></ProtectedRoute>}>
-              <Route index element={<Dashboard />} />
-              <Route path="menu" element={<MenuManagement />} />
-              <Route path="tables" element={<TableManagement />} />
+            <Route path="/admin" element={<ProtectedRoute allowedRoles={["manager", "receptionist"]}><AdminLayout /></ProtectedRoute>}>
+              <Route index element={<ProtectedRoute allowedRoles={["manager"]}><Dashboard /></ProtectedRoute>} />
+              <Route path="menu" element={<ProtectedRoute allowedRoles={["manager"]}><MenuManagement /></ProtectedRoute>} />
+              <Route path="tables" element={<ProtectedRoute allowedRoles={["manager"]}><TableManagement /></ProtectedRoute>} />
+              <Route path="reception" element={<ProtectedRoute allowedRoles={["manager", "receptionist"]}><Reception /></ProtectedRoute>} />
             </Route>
             <Route path="/kds" element={<ProtectedRoute allowedRoles={["manager", "kitchen", "bar"]}><KDS /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
