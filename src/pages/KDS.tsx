@@ -6,7 +6,8 @@ import { OrderCard } from "@/components/OrderCard";
 import { Order, OrderStatus, Station } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { LogOut, ChefHat, Wine, ScanLine } from "lucide-react";
+import { LogOut, ChefHat, Wine, ScanLine, Flame } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { useScanner } from "@/hooks/useScanner";
 import { toast } from "sonner";
 
