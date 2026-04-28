@@ -43,6 +43,20 @@ export default function KDS() {
       .filter((x) => x.items.length > 0);
   }, [orders, view]);
 
+  // Production summary — grouped quantities of items currently 'preparing' for the active station
+  const productionSummary = useMemo(() => {
+    const map = orders
+      .filter((o) => o.status === "preparing")
+      .flatMap((o) => o.items.filter((it) => it.station === view))
+      .reduce<Record<string, number>>((acc, it) => {
+        acc[it.name] = (acc[it.name] ?? 0) + it.quantity;
+        return acc;
+      }, {});
+    return Object.entries(map)
+      .map(([name, totalQuantity]) => ({ name, totalQuantity }))
+      .sort((a, b) => b.totalQuantity - a.totalQuantity);
+  }, [orders, view]);
+
   // QR scanner — Bar view only
   const handleScan = useCallback(
     (code: string) => {
