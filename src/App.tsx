@@ -1,7 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { StoreProvider } from "@/contexts/StoreContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -14,7 +13,7 @@ import KDS from "@/pages/KDS";
 import NotFound from "@/pages/NotFound";
 
 const App = () => (
-  <TooltipProvider>
+  <>
     <Toaster />
     <Sonner />
     <AuthProvider>
@@ -33,7 +32,7 @@ const App = () => (
         </BrowserRouter>
       </StoreProvider>
     </AuthProvider>
-  </TooltipProvider>
+  </>
 );
 
 export default App;
