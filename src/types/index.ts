@@ -1,4 +1,15 @@
-export type UserRole = "manager" | "kitchen" | "bar";
+export type UserRole = "manager" | "kitchen" | "bar" | "receptionist";
+
+export interface Customer {
+  id: string;
+  fullName: string;
+  cpf: string;
+  birthDate: string;
+  tabNumber: string;
+  rfid?: string;
+  checkInAt: Date;
+  active: boolean;
+}
 
 export interface User {
   id: string;
