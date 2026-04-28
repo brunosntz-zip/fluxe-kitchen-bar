@@ -130,7 +130,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <StoreContext.Provider value={{ menuItems, addMenuItem, updateMenuItem, deleteMenuItem, tables, addTable, deleteTable, orders, addOrder, updateOrderStatus, removeOrder }}>
+    <StoreContext.Provider value={{ menuItems, addMenuItem, updateMenuItem, deleteMenuItem, tables, addTable, deleteTable, orders, addOrder, updateOrderStatus, removeOrder, customers, addCustomer, checkOutCustomer }}>
       {children}
     </StoreContext.Provider>
   );
