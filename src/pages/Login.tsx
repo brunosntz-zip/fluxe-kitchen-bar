@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ChefHat, ShieldCheck } from "lucide-react";
+import { ChefHat, ShieldCheck, Wine } from "lucide-react";
 
 export default function Login() {
   const { login } = useAuth();
@@ -14,7 +14,8 @@ export default function Login() {
   const [name, setName] = useState("");
 
   const handleLogin = (role: UserRole) => {
-    const displayName = name.trim() || (role === "manager" ? "Gerente" : "Cozinha");
+    const fallback = role === "manager" ? "Gerente" : role === "bar" ? "Bar" : "Cozinha";
+    const displayName = name.trim() || fallback;
     login(displayName, role);
     navigate(role === "manager" ? "/admin" : "/kds");
   };
@@ -34,18 +35,22 @@ export default function Login() {
             <Label htmlFor="name">Seu nome (opcional)</Label>
             <Input id="name" placeholder="Ex: Carlos" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-3 gap-3">
             <Button onClick={() => handleLogin("manager")} className="h-20 flex-col gap-2" variant="default">
-              <ShieldCheck className="h-6 w-6" />
-              <span className="text-sm font-semibold">Gerente</span>
+              <ShieldCheck className="h-5 w-5" />
+              <span className="text-xs font-semibold">Gerente</span>
             </Button>
             <Button onClick={() => handleLogin("kitchen")} className="h-20 flex-col gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/80" variant="secondary">
-              <ChefHat className="h-6 w-6" />
-              <span className="text-sm font-semibold">Cozinha</span>
+              <ChefHat className="h-5 w-5" />
+              <span className="text-xs font-semibold">Cozinha</span>
+            </Button>
+            <Button onClick={() => handleLogin("bar")} className="h-20 flex-col gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/80" variant="secondary">
+              <Wine className="h-5 w-5" />
+              <span className="text-xs font-semibold">Bar</span>
             </Button>
           </div>
           <p className="text-xs text-muted-foreground text-center">
-            Gerente acessa o painel Admin e KDS. Cozinha acessa apenas o KDS.
+            Gerente acessa Admin e KDS. Cozinha e Bar acessam apenas seus KDS.
           </p>
         </CardContent>
       </Card>
