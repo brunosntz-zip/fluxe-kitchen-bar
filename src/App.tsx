@@ -13,7 +13,7 @@ import KDS from "@/pages/KDS";
 import NotFound from "@/pages/NotFound";
 
 const App = () => (
-  <TooltipProvider>
+  <>
     <Toaster />
     <Sonner />
     <AuthProvider>
@@ -32,7 +32,7 @@ const App = () => (
         </BrowserRouter>
       </StoreProvider>
     </AuthProvider>
-  </TooltipProvider>
+  </>
 );
 
 export default App;
