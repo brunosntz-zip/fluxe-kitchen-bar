@@ -1,28 +1,36 @@
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { UserRole } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { ChefHat, ShieldCheck, Wine, Users } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
+import { ChefHat, LogIn } from "lucide-react";
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = (role: UserRole) => {
-    const fallback =
-      role === "manager" ? "Gerente" :
-      role === "bar" ? "Bar" :
-      role === "receptionist" ? "Recepção" : "Cozinha";
-    const displayName = name.trim() || fallback;
-    login(displayName, role);
-    if (role === "manager") navigate("/admin");
-    else if (role === "receptionist") navigate("/admin/reception");
-    else navigate("/kds");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsLoading(true);
+
+    try {
+      const user = await login(username, password);
+      
+      if (user.role === "manager") navigate("/admin");
+      else if (user.role === "receptionist") navigate("/admin/reception");
+      else navigate("/kds");
+    } catch (err: any) {
+      setError(err.message || "Erro ao fazer login.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -35,33 +43,51 @@ export default function Login() {
           <CardTitle className="text-2xl font-bold">Fluxe</CardTitle>
           <CardDescription>Sistema de Gestão para Bares e Restaurantes</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="name">Seu nome (opcional)</Label>
-            <Input id="name" placeholder="Ex: Carlos" value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <Button onClick={() => handleLogin("manager")} className="h-20 flex-col gap-2" variant="default">
-              <ShieldCheck className="h-5 w-5" />
-              <span className="text-xs font-semibold">Gerente</span>
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-4">
+            {error && (
+              <div className="bg-destructive/15 text-destructive text-sm p-3 rounded-md">
+                {error}
+              </div>
+            )}
+            <div className="space-y-2">
+              <Label htmlFor="username">Usuário</Label>
+              <Input 
+                id="username" 
+                placeholder="Ex: admin" 
+                value={username} 
+                onChange={(e) => setUsername(e.target.value)} 
+                required
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password">Senha</Label>
+              <Input 
+                id="password" 
+                type="password"
+                placeholder="***" 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+                required
+              />
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              <LogIn className="mr-2 h-4 w-4" /> Entrar
             </Button>
-            <Button onClick={() => handleLogin("receptionist")} className="h-20 flex-col gap-2" variant="default">
-              <Users className="h-5 w-5" />
-              <span className="text-xs font-semibold">Recepção</span>
-            </Button>
-            <Button onClick={() => handleLogin("kitchen")} className="h-20 flex-col gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/80" variant="secondary">
-              <ChefHat className="h-5 w-5" />
-              <span className="text-xs font-semibold">Cozinha</span>
-            </Button>
-            <Button onClick={() => handleLogin("bar")} className="h-20 flex-col gap-2 bg-secondary text-secondary-foreground hover:bg-secondary/80" variant="secondary">
-              <Wine className="h-5 w-5" />
-              <span className="text-xs font-semibold">Bar</span>
-            </Button>
-          </div>
-          <p className="text-xs text-muted-foreground text-center">
-            Cada perfil é direcionado para sua área de trabalho.
-          </p>
-        </CardContent>
+            
+            <div className="text-xs text-muted-foreground w-full p-3 bg-muted/50 rounded-lg">
+              <p className="font-semibold mb-1">Credenciais de Teste:</p>
+              <ul className="space-y-1">
+                <li>Usuário: <b>admin</b> | Senha: <b>123</b> (Gerente)</li>
+                <li>Usuário: <b>recepcao</b> | Senha: <b>123</b> (Recepção)</li>
+                <li>Usuário: <b>cozinha</b> | Senha: <b>123</b> (Cozinha)</li>
+                <li>Usuário: <b>bar</b> | Senha: <b>123</b> (Bar)</li>
+              </ul>
+            </div>
+          </CardFooter>
+        </form>
       </Card>
     </div>
   );

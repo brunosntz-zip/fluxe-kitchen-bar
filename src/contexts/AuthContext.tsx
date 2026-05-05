@@ -3,17 +3,22 @@ import { User, UserRole } from "@/types";
 
 interface AuthContextType {
   user: User | null;
-  login: (name: string, role: UserRole) => void;
+  login: (username: string, password?: string) => Promise<User>;
   logout: () => void;
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const MOCK_USERS: Record<string, User> = {
-  manager: { id: "1", name: "Carlos", role: "manager" },
-  kitchen: { id: "2", name: "Chef Ana", role: "kitchen" },
-};
+// Extendendo User para testes com senha local
+type MockUser = User & { password?: string };
+
+export const MOCK_USERS: MockUser[] = [
+  { id: "1", username: "admin", password: "123", name: "Carlos Admin", role: "manager" },
+  { id: "2", username: "recepcao", password: "123", name: "Maria Recepção", role: "receptionist" },
+  { id: "3", username: "cozinha", password: "123", name: "Chef Ana", role: "kitchen" },
+  { id: "4", username: "bar", password: "123", name: "João Bar", role: "bar" }
+];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
@@ -21,10 +26,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return saved ? JSON.parse(saved) : null;
   });
 
-  const login = useCallback((name: string, role: UserRole) => {
-    const u: User = { id: crypto.randomUUID(), name, role };
-    setUser(u);
-    localStorage.setItem("fluxe_user", JSON.stringify(u));
+  const login = useCallback(async (username: string, password?: string) => {
+    const foundUser = MOCK_USERS.find(u => u.username === username && u.password === password);
+    if (!foundUser) {
+      throw new Error("Usuário ou senha inválidos.");
+    }
+    
+    // Remover a senha do objeto de usuário logado
+    const { password: _, ...userWithoutPassword } = foundUser;
+    
+    setUser(userWithoutPassword);
+    localStorage.setItem("fluxe_user", JSON.stringify(userWithoutPassword));
+    return userWithoutPassword;
   }, []);
 
   const logout = useCallback(() => {

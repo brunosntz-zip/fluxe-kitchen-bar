@@ -33,7 +33,6 @@ const STATUS_CONFIG = {
 
 interface OrderCardProps {
   order: Order;
-  /** Items already filtered to this station's view */
   items?: OrderItem[];
   onAdvance: (id: string, status: OrderStatus) => void;
   onRemove: (id: string) => void;
